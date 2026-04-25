@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyTikStats — TikTok Analytics for Creators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ee;
+      --cream: #ede9e3;
+      --tiktok-red: #fe2c55;
+      --tiktok-cyan: #25f4ee;
+      --accent: #fe2c55;
+      --muted: #6b6560;
+      --card-bg: #131313;
+      --border: rgba(245,242,238,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 3rem;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--tiktok-red); }
+
+    nav ul {
+      display: flex; gap: 2rem; list-style: none;
+    }
+
+    nav ul a {
+      font-size: 0.875rem; font-weight: 500;
+      color: rgba(245,242,238,0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--white); }
+
+    .nav-cta {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--black) !important;
+      background: var(--white);
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--tiktok-cyan) !important;
+      color: var(--black) !important;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      opacity: 0.15;
+    }
+
+    .glow-red {
+      background: var(--tiktok-red);
+      top: -100px; left: -100px;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+
+    .glow-cyan {
+      background: var(--tiktok-cyan);
+      bottom: -100px; right: -100px;
+      animation: drift 10s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to   { transform: translate(60px, 40px); }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tiktok-cyan);
+      border: 1px solid rgba(37,244,238,0.3);
+      padding: 0.35rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--tiktok-cyan);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    h1 .line-red { color: var(--tiktok-red); display: block; }
+    h1 .line-cyan { color: var(--tiktok-cyan); display: block; }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 300;
+      color: rgba(245,242,238,0.55);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--black);
+      background: var(--white);
+      border: none; cursor: pointer;
+      padding: 0.9rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: var(--tiktok-cyan);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem; font-weight: 600;
+      color: var(--white);
+      background: transparent;
+      border: 1px solid rgba(245,242,238,0.2);
+      cursor: pointer;
+      padding: 0.9rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    /* ── STATS TICKER ── */
+    .ticker-wrap {
+      width: 100%;
+      margin-top: 5rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 0;
+      overflow: hidden;
+      position: relative;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .ticker {
+      display: flex; gap: 4rem;
+      white-space: nowrap;
+      animation: scroll 20s linear infinite;
+    }
+
+    .ticker-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 0.8rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: rgba(245,242,238,0.4);
+    }
+
+    .ticker-item strong {
+      font-family: 'Syne', sans-serif;
+      color: var(--white); font-size: 1rem;
+    }
+
+    .ticker-sep { color: var(--tiktok-red); font-size: 1.2rem; }
+
+    @keyframes scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── FEATURES ── */
+    .section {
+      padding: 7rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--tiktok-red);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem; font-weight: 300;
+      color: rgba(245,242,238,0.5);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 4rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature-card {
+      background: var(--black);
+      padding: 2.5rem;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--tiktok-red), var(--tiktok-cyan));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover { background: #111; }
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-icon {
+      font-size: 2rem; margin-bottom: 1.25rem;
+    }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem; line-height: 1.65;
+      color: rgba(245,242,238,0.5);
+    }
+
+    /* ── METRICS SHOWCASE ── */
+    .metrics-section {
+      background: #0d0d0d;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .metrics-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 7rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .metrics-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metrics-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(254,44,85,0.05), rgba(37,244,238,0.05));
+      pointer-events: none;
+    }
+
+    .metrics-card-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .metrics-card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(245,242,238,0.4);
+    }
+
+    .metrics-badge {
+      font-size: 0.7rem; font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 100px;
+      background: rgba(37,244,238,0.1);
+      color: var(--tiktok-cyan);
+    }
+
+    .big-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.5rem; font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .big-number .unit { font-size: 1.5rem; color: var(--tiktok-cyan); }
+
+    .metric-row {
+      display: flex; justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .metric-row:last-child { border-bottom: none; }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: rgba(245,242,238,0.5);
+    }
+
+    .metric-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+    }
+
+    .metric-up { color: var(--tiktok-cyan); }
+    .metric-down { color: var(--tiktok-red); }
+
+    .bar-chart {
+      margin-top: 1.5rem;
+      display: flex; align-items: flex-end;
+      gap: 0.4rem; height: 80px;
+    }
+
+    .bar {
+      flex: 1; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--tiktok-red), rgba(254,44,85,0.3));
+      animation: growBar 1s ease both;
+    }
+
+    @keyframes growBar {
+      from { transform: scaleY(0); transform-origin: bottom; }
+      to   { transform: scaleY(1); transform-origin: bottom; }
+    }
+
+    .bar:nth-child(2) { animation-delay: 0.05s; }
+    .bar:nth-child(3) { animation-delay: 0.1s; background: linear-gradient(180deg, var(--tiktok-cyan), rgba(37,244,238,0.3)); }
+    .bar:nth-child(4) { animation-delay: 0.15s; }
+    .bar:nth-child(5) { animation-delay: 0.2s; }
+    .bar:nth-child(6) { animation-delay: 0.25s; background: linear-gradient(180deg, var(--tiktok-cyan), rgba(37,244,238,0.3)); }
+    .bar:nth-child(7) { animation-delay: 0.3s; }
+
+    /* ── STEPS ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .step {
+      position: relative; padding-top: 1rem;
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 4rem; font-weight: 800;
+      color: rgba(245,242,238,0.05);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .step p {
+      font-size: 0.9rem; line-height: 1.65;
+      color: rgba(245,242,238,0.5);
+    }
+
+    .step-connector {
+      position: absolute; top: 2.5rem; right: -1rem;
+      width: 2rem; height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-section {
+      padding: 5rem 3rem;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 700px; margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: 4rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(254,44,85,0.1), transparent 60%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-box p {
+      font-size: 1rem; font-weight: 300;
+      color: rgba(245,242,238,0.5);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1rem;
+      color: var(--white); text-decoration: none;
+    }
+
+    .footer-logo span { color: var(--tiktok-red); }
+
+    .footer-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.8rem; color: rgba(245,242,238,0.4);
+      text-decoration: none; transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    .footer-copy {
+      font-size: 0.75rem; color: rgba(245,242,238,0.25);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      nav ul { display: none; }
+      .section { padding: 5rem 1.5rem; }
+      .metrics-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .step-connector { display: none; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="logo">MyTik<span>Stats</span></a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it Works</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="#" class="nav-cta">Get Started</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow glow-red"></div>
+    <div class="hero-glow glow-cyan"></div>
+
+    <div class="hero-badge">Your Personal TikTok Growth Dashboard</div>
+
+    <h1>
+      Know Your
+      <span class="line-red">Numbers.</span>
+      <span class="line-cyan">Grow Faster.</span>
+    </h1>
+
+    <p class="hero-sub">
+      MyTikStats pulls your TikTok analytics — views, likes, comments, shares, and follower growth — so you always know what's working.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Start Tracking Free</a>
+      <a href="#features" class="btn-ghost">See Features →</a>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <div class="ticker-item"><strong>Views</strong> Track every play</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Likes</strong> Monitor engagement</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Comments</strong> Measure conversations</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Shares</strong> Watch virality</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Followers</strong> See growth trends</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Date Range</strong> Custom periods</div>
+        <div class="ticker-sep">✦</div>
+        <!-- Duplicate for seamless loop -->
+        <div class="ticker-item"><strong>Views</strong> Track every play</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Likes</strong> Monitor engagement</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Comments</strong> Measure conversations</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Shares</strong> Watch virality</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Followers</strong> See growth trends</div>
+        <div class="ticker-sep">✦</div>
+        <div class="ticker-item"><strong>Date Range</strong> Custom periods</div>
+        <div class="ticker-sep">✦</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METRICS SHOWCASE -->
+  <div class="metrics-section">
+    <div class="metrics-inner">
+      <div>
+        <div class="section-label">Live Dashboard</div>
+        <h2 class="section-title">All your metrics<br/>in one place</h2>
+        <p class="section-sub">
+          See your TikTok performance at a glance. Track any date range, export to Excel, and understand what drives your growth.
+        </p>
+        <a href="#" class="btn-primary">Connect Your Account</a>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="metrics-card">
+          <div class="metrics-card-header">
+            <span class="metrics-card-title">Total Views — Last 30 Days</span>
+            <span class="metrics-badge">↑ 24%</span>
+          </div>
+          <div class="big-number">2.4<span class="unit">M</span></div>
+          <div class="bar-chart">
+            <div class="bar" style="height:40%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:50%"></div>
+            <div class="bar" style="height:90%"></div>
+            <div class="bar" style="height:75%"></div>
+            <div class="bar" style="height:100%"></div>
+          </div>
+        </div>
+
+        <div class="metrics-card">
+          <div class="metrics-card-header">
+            <span class="metrics-card-title">Video Breakdown</span>
+            <span class="metrics-badge">7 videos</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">👁 Total Views</span>
+            <span class="metric-value metric-up">2,418,302</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">❤️ Total Likes</span>
+            <span class="metric-value">184,290</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">💬 Comments</span>
+            <span class="metric-value">9,142</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">🔁 Shares</span>
+            <span class="metric-value metric-up">31,008</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">👥 New Followers</span>
+            <span class="metric-value metric-up">+4,821</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need<br/>to track your growth</h2>
+    <p class="section-sub">Built specifically for creators who want clear, honest data about their TikTok performance.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Date Range Analytics</h3>
+        <p>Pull metrics for any custom date range — a week, a month, a campaign. See exactly how your content performed over any period.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Growth Tracking</h3>
+        <p>Monitor follower growth over time. Spot which videos drove spikes and understand what content attracts new audiences.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎬</div>
+        <h3>Per-Video Breakdown</h3>
+        <p>See views, likes, comments, shares, and duration for every video you've posted — all in one sortable table.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📥</div>
+        <h3>Excel Export</h3>
+        <p>Download your data as a formatted Excel file with charts, summaries, and totals — ready to share with your team or brand partners.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Your Data Only</h3>
+        <p>MyTikStats only accesses your own account data. We never store your videos or personal content — just the numbers you need.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Always Up to Date</h3>
+        <p>Pull fresh data any time with one click. No stale reports — always reflecting your latest video performance in real time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how-it-works" style="background:#0d0d0d; max-width:100%; border-top:1px solid var(--border);">
+    <div style="max-width:1200px; margin:0 auto;">
+      <div class="section-label">How it Works</div>
+      <h2 class="section-title">Three steps to<br/>full clarity</h2>
+      <p class="section-sub" style="margin-bottom:5rem;">No complicated setup. No technical knowledge required.</p>
+
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Connect Your TikTok</h3>
+          <p>Authorize MyTikStats to read your account data via TikTok's official API. We only request read-only access.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Choose Your Date Range</h3>
+          <p>Pick any start and end date. MyTikStats fetches all videos posted in that period and calculates your metrics.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Download Your Report</h3>
+          <p>Get a beautifully formatted Excel report with all your video stats, account summary, and totals. Ready to go.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Start tracking your<br/>TikTok growth today</h2>
+      <p>Join creators who use MyTikStats to understand their audience and grow with confidence.</p>
+      <a href="#" class="btn-primary">Get Started Free</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-logo">MyTik<span>Stats</span></a>
+    <ul class="footer-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="terms.html">Terms of Service</a></li>
+      <li><a href="privacy.html">Privacy Policy</a></li>
+      <li><a href="mailto:contact@mytikstats.com">Contact</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 MyTikStats. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
